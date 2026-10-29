@@ -6,6 +6,7 @@ def hasReleaseKeys = releaseKeys.every { System.getenv(it) }
 android {
     namespace 'io.github.oneday1factboop.viciouscycle'
     compileSdk 36
+    buildToolsVersion '36.0.0'
 
     defaultConfig {
         applicationId 'io.github.oneday1factboop.viciouscycle'
