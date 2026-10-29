@@ -17,6 +17,9 @@ public final class SceneView extends View {
         @Override protected int sizeOf(String key,Bitmap value){return value.getAllocationByteCount();}
     };
     private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+    private final Rect sourceRect=new Rect();
+    private final RectF destination=new RectF();
+    private Shader vignette;
     private JSONObject frame;
     private Bitmap bitmap;
     private String file="";
@@ -46,10 +49,12 @@ public final class SceneView extends View {
         int left=frame.optInt("col")*cellW,top=frame.optInt("row")*cellH;
         float ratio=Math.max(getWidth()/(float)cellW,getHeight()/(float)cellH)*zoom;
         float width=cellW*ratio,height=cellH*ratio;
-        RectF dest=new RectF((getWidth()-width)/2,(getHeight()-height)/2,(getWidth()+width)/2,(getHeight()+height)/2);
-        paint.setShader(null);canvas.drawBitmap(bitmap,new Rect(left,top,left+cellW,top+cellH),dest,paint);
-        paint.setShader(new LinearGradient(0,0,0,getHeight(),new int[]{0x99000000,0x08000000,0xE8171310},new float[]{0,.4f,1},Shader.TileMode.CLAMP));
+        destination.set((getWidth()-width)/2,(getHeight()-height)/2,(getWidth()+width)/2,(getHeight()+height)/2);
+        sourceRect.set(left,top,left+cellW,top+cellH);
+        paint.setShader(null);canvas.drawBitmap(bitmap,sourceRect,destination,paint);
+        paint.setShader(vignette);
         canvas.drawRect(0,0,getWidth(),getHeight(),paint);paint.setShader(null);
     }
+    @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){super.onSizeChanged(w,h,oldw,oldh);if(h>0)vignette=new LinearGradient(0,0,0,h,new int[]{0x99000000,0x08000000,0xE8171310},new float[]{0,.4f,1},Shader.TileMode.CLAMP);}
     @Override protected void onDetachedFromWindow(){if(animation!=null)animation.cancel();super.onDetachedFromWindow();}
 }

@@ -7,7 +7,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class StoryEngineTest {
-    private JSONObject data()throws Exception{return new JSONObject(Files.readString(Path.of(System.getProperty("vc.data"))));}
+    private JSONObject data()throws Exception{return new JSONObject(new String(Files.readAllBytes(Paths.get(System.getProperty("vc.data"))), java.nio.charset.StandardCharsets.UTF_8));}
     private JSONObject redirect(JSONObject n,JSONObject flags){JSONArray rules=n.optJSONArray("resolve");if(rules!=null)for(int i=0;i<rules.length();i++)if(StoryEngine.matches(rules.optJSONObject(i),flags))return rules.optJSONObject(i);return null;}
     private List<Integer> path(JSONObject story,String id,JSONObject flags,String target,Set<String> visited){
         if(id.equals(target))return new ArrayList<>();
@@ -56,6 +56,6 @@ public class StoryEngineTest {
     }
     @Test public void mandatoryInspectionAndCheckpointReplayPreserveMeaning()throws Exception{
         StoryEngine e=new StoryEngine(data(),"en",null);e.start();List<Integer> route=path(e.story(),e.state.optString("id"),e.state.optJSONObject("flags"),"c3_wait",new HashSet<>());assertNotNull(route);drive(e,"c3_wait",route);assertNotNull(e.checkpoint(2));assertNotNull(e.checkpoint(3));e.replay(2);assertEquals(2,e.chapter());assertNull(e.checkpoint(3));
-        e.go("coldWallet");assertTrue(e.node().has("action"));assertFalse(e.next());e.inspect(e.node().optJSONObject("action"),true);assertTrue(e.actionDone());assertTrue(e.next());
+        e.start();e.go("coldWallet");assertTrue(e.node().has("action"));assertFalse(e.next());e.inspect(e.node().optJSONObject("action"),true);assertTrue(e.actionDone());assertTrue(e.next());
     }
 }

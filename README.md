@@ -37,7 +37,7 @@ Keep signing material outside the repository. The production application ID is `
 
 ## Google Play
 
-[Release preparation](docs/google-play.md) covers the internal testing upload, listing and required Console declarations. [Privacy policy](docs/privacy.html). The `Android build` workflow creates an installable debug APK and a release bundle. The manual `Google Play internal upload` workflow signs and uploads a draft internal release after the repository's signing and Play secrets have been configured.
+[中文連接與上架指南](docs/connect-play-zh.md) · [Release preparation](docs/google-play.md) covers the internal testing upload, listing and required Console declarations. [Privacy policy](docs/privacy.html). The `Android build` workflow creates an installable debug APK and a release bundle. The manual `Google Play internal upload` workflow signs and uploads a draft internal release after the repository's signing and Play secrets have been configured.
 
 The native engine tests drive all ten endings in both languages, serialize and restore saves, verify mandatory inspections and replay, and prove early-ending recovery reaches a later chapter. The source story checks cover 4,446 opening route combinations, 4,320 later continuation routes, all ten endings, English coverage, language switching, legacy saves, evidence and ending recovery. Native build and lint checks complement these checks; they do not replace Android device testing.
 
@@ -56,4 +56,4 @@ The bundled poster font is a Noto Sans CJK subset; its license is in `game/asset
 
 ## Release status
 
-The first Android build uses test ads. Google Play publisher credentials and real AdMob IDs have not been connected. The source repository is public; that does not imply a Google Play release has been uploaded or approved.
+The first Android build uses test ads. Signed APK and AAB builds are available in Releases. Native engine tests, Android lint and release signing verification passed. Physical Android device testing and live ad delivery have not yet been verified. Google Play publisher credentials and real AdMob IDs have not been connected. The source repository is public; that does not imply a Google Play release has been uploaded or approved.

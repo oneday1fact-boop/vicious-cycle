@@ -1,6 +1,7 @@
 package io.github.oneday1factboop.viciouscycle;
 
-import android.app.Activity;
+import androidx.activity.ComponentActivity;
+import androidx.activity.OnBackPressedCallback;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /** Full-screen native Android visual novel. No WebView or hosted page is used. */
-public final class MainActivity extends Activity {
+public final class MainActivity extends ComponentActivity {
     private static final int INK=0xFF171310, PAPER=0xFFF3E8D8, ORANGE=0xFFFF7A26, MUTED=0xFFC3AE99;
     private final Handler handler=new Handler(Looper.getMainLooper());
     private SharedPreferences preferences;
@@ -53,7 +54,7 @@ public final class MainActivity extends Activity {
         if(Build.VERSION.SDK_INT>=28){WindowManager.LayoutParams a=getWindow().getAttributes();a.layoutInDisplayCutoutMode=WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;getWindow().setAttributes(a);}
         if(Build.VERSION.SDK_INT>=30)getWindow().setDecorFitsSystemWindows(false);
         ads=new GameAds(this);renderCover();ads.start();
-        if(Build.VERSION.SDK_INT>=33)getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,this::back);
+        getOnBackPressedDispatcher().addCallback(this,new OnBackPressedCallback(true){@Override public void handleOnBackPressed(){back();}});
         immersive();
     }
     private String assetText(String path)throws Exception{
@@ -145,12 +146,12 @@ public final class MainActivity extends Activity {
     }
     private void reveal(){stopTyping();if(passage==null)return;passage.setText(pending);showControls();}
     private void showControls(){
-        if(controls==null)return;controls.removeAllViews();JSONObject n=engine.node();
+        if(controls==null)return;controls.removeAllViews();JSONObject n=engine.node();final String renderedId=engine.state.optString("id");
         if(n.has("action")&&!engine.actionDone()){controls.addView(text(ui("inspectHint"),14,ORANGE));return;}
         JSONArray choices=n.optJSONArray("choices");
-        if(choices!=null){for(int i=0;i<choices.length();i++){final int index=i;controls.addView(button(choices.optJSONObject(i).optString("label"),()->{engine.choose(index);save();renderGame();},false));}return;}
-        if(n.has("continue")){controls.addView(text(tr("章節完","CHAPTER COMPLETE"),22,ORANGE));controls.addView(button(ui("continue"),()->ads.chapterBreak(()->{engine.continueChapter();save();renderGame();}),true));}
-        else if(n.has("next"))controls.addView(button(ui("next"),()->{engine.next();save();renderGame();},true));
+        if(choices!=null){for(int i=0;i<choices.length();i++){final int index=i;controls.addView(button(choices.optJSONObject(i).optString("label"),()->{if(!renderedId.equals(engine.state.optString("id")))return;engine.choose(index);save();renderGame();},false));}return;}
+        if(n.has("continue")){controls.addView(text(tr("章節完","CHAPTER COMPLETE"),22,ORANGE));controls.addView(button(ui("continue"),()->{if(!renderedId.equals(engine.state.optString("id")))return;ads.chapterBreak(()->{if(!renderedId.equals(engine.state.optString("id")))return;engine.continueChapter();save();renderGame();});},true));}
+        else if(n.has("next"))controls.addView(button(ui("next"),()->{if(!renderedId.equals(engine.state.optString("id")))return;engine.next();save();renderGame();},true));
     }
     private void openInfo(JSONObject original,boolean mandatory){
         boolean wasTyping=typing;if(wasTyping)reveal();JSONObject source=engine.variant(original);engine.inspect(source,mandatory);save();
@@ -234,7 +235,6 @@ public final class MainActivity extends Activity {
         panel.addView(text(tr("本程式使用Google AdMob廣告服務。Google可能處理IP位址、廣告及裝置識別資料、診斷資料和廣告互動，以提供廣告及防止詐騙。適用地區會先顯示同意選項；你可隨時在選單更新可用的廣告私隱選項。拒絕或無法載入廣告不影響遊戲進度。","This app uses Google AdMob. Google may process IP addresses, device and advertising identifiers, diagnostics and ad interactions to serve ads and prevent fraud. Consent choices appear where required; available ad privacy choices can be reopened from the menu. Declining consent or unavailable ads never blocks the story."),17,PAPER));
         panel.addView(text("Google privacy policy: https://policies.google.com/privacy\nPrivacy questions: https://github.com/oneday1fact-boop/vicious-cycle/issues",14,MUTED));showDialog(tr("私隱政策","Privacy policy"),panel,ui("close"),null);
     }
-    @Override @SuppressWarnings("deprecation") public void onBackPressed(){back();}
     private void back(){
         if(activeDialog!=null){dismissDialog();return;}if(typing){reveal();return;}
         if(!screen.equals("cover")){if(hasSave)save();renderCover();return;}
