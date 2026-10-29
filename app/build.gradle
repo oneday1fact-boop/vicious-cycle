@@ -2,6 +2,11 @@ plugins { id 'com.android.application' }
 
 def releaseKeys = ['VC_UPLOAD_KEYSTORE', 'VC_UPLOAD_STORE_PASSWORD', 'VC_UPLOAD_KEY_ALIAS', 'VC_UPLOAD_KEY_PASSWORD']
 def hasReleaseKeys = releaseKeys.every { System.getenv(it) }
+def adApp = System.getenv('VC_ADMOB_APP_ID')
+def adUnit = System.getenv('VC_ADMOB_INTERSTITIAL_ID')
+if ((adApp && !adUnit) || (!adApp && adUnit)) throw new GradleException('Set both AdMob IDs, or neither for test ads.')
+if (adApp && !(adApp ==~ /ca-app-pub-\d{16}~\d{10}/)) throw new GradleException('Invalid AdMob application ID')
+if (adUnit && !(adUnit ==~ /ca-app-pub-\d{16}\/\d{10}/)) throw new GradleException('Invalid AdMob interstitial ID')
 
 android {
     namespace 'io.github.oneday1factboop.viciouscycle'
@@ -15,6 +20,9 @@ android {
         versionCode = (System.getenv('VC_VERSION_CODE') ?: '1').toInteger()
         versionName = System.getenv('VC_VERSION_NAME') ?: '1.0.0'
         resConfigs 'en', 'zh-rTW', 'zh-rHK'
+        manifestPlaceholders = [admobAppId: 'ca-app-pub-3940256099942544~3347511713']
+        buildConfigField 'boolean', 'TEST_ADS', 'true'
+        buildConfigField 'String', 'ADMOB_INTERSTITIAL_ID', '"ca-app-pub-3940256099942544/1033173712"'
     }
     signingConfigs {
         if (hasReleaseKeys) {
@@ -31,6 +39,11 @@ android {
         release {
             if (hasReleaseKeys) signingConfig signingConfigs.release
             minifyEnabled false
+            if (adApp && adUnit) {
+                manifestPlaceholders = [admobAppId: adApp]
+                buildConfigField 'boolean', 'TEST_ADS', 'false'
+                buildConfigField 'String', 'ADMOB_INTERSTITIAL_ID', '"' + adUnit + '"'
+            }
         }
     }
     compileOptions {
@@ -40,17 +53,20 @@ android {
     buildFeatures { buildConfig true }
     sourceSets.main.assets.srcDir layout.buildDirectory.dir('generated/gameAssets')
     lint { abortOnError true; checkReleaseBuilds true }
+    testOptions.unitTests.all { systemProperty 'vc.data', rootProject.file('game/native-data.json').absolutePath }
 }
 
 tasks.register('syncGameAssets', Sync) {
     from(rootProject.file('game')) {
-        include 'index.html', '*.js', '*.css', 'assets/**'
-        exclude 'verify.cjs'
+        include 'native-data.json', 'assets/**'
     }
     into layout.buildDirectory.dir('generated/gameAssets/game')
 }
 tasks.named('preBuild').configure { dependsOn 'syncGameAssets' }
 
 dependencies {
-    implementation 'androidx.webkit:webkit:1.14.0'
+    implementation 'com.google.android.gms:play-services-ads:25.5.0'
+    implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
 }

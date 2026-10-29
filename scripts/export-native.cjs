@@ -1,0 +1,12 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const root=path.resolve(__dirname,'..'),game=path.join(root,'game');
+const data=require(path.join(game,'story.js'));
+const ctx={...structuredClone(data),structuredClone,localStorage:{getItem:()=>null,setItem(){}},console};
+vm.createContext(ctx);vm.runInContext(fs.readFileSync(path.join(game,'i18n.js'),'utf8'),ctx);
+const app=fs.readFileSync(path.join(game,'app.js'),'utf8');
+const artLiteral=app.match(/const ART=(\{[\s\S]*?\n\});/)[1];
+const art=vm.runInNewContext('('+artLiteral+')');art.cover={file:'assets/creepy-cover.png',cols:1,rows:1,col:0,row:0,name:art.cover.name};
+const exported=vm.runInContext('({start:START,languages:languageViews,ui:UI_TEXT,artEnglish:EN_ART})',ctx);
+exported.art=art;exported.schema=1;
+fs.writeFileSync(path.join(game,'native-data.json'),JSON.stringify(exported));
+console.log(`Exported native story: ${Object.keys(exported.languages.en.story).length} nodes, ${Object.keys(art).length} art frames, two languages.`);

@@ -23,7 +23,8 @@ jobs:
           packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
       - uses: gradle/actions/setup-gradle@v4
       - run: node game/verify.cjs
-      - run: ./gradlew --no-daemon lintDebug assembleDebug bundleRelease
+      - run: node scripts/export-native.cjs && git diff --exit-code game/native-data.json
+      - run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug bundleRelease
       - uses: actions/upload-artifact@v4
         with:
           name: vicious-cycle-android

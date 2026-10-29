@@ -41,6 +41,7 @@ jobs:
           printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
           printf '%s' "$PLAY_ACCOUNT" > "$RUNNER_TEMP/play-account.json"
       - run: node game/verify.cjs
+      - run: node scripts/export-native.cjs && git diff --exit-code game/native-data.json
       - name: Build signed bundle
         env:
           VC_UPLOAD_KEYSTORE: ${{ runner.temp }}/upload.jks
@@ -49,9 +50,11 @@ jobs:
           VC_UPLOAD_KEY_PASSWORD: ${{ secrets.VC_UPLOAD_KEY_PASSWORD }}
           VC_VERSION_CODE: ${{ inputs.version_code }}
           VC_VERSION_NAME: ${{ inputs.version_name }}
+          VC_ADMOB_APP_ID: ${{ vars.VC_ADMOB_APP_ID }}
+          VC_ADMOB_INTERSTITIAL_ID: ${{ vars.VC_ADMOB_INTERSTITIAL_ID }}
         run: |
           test -n "$VC_UPLOAD_STORE_PASSWORD" && test -n "$VC_UPLOAD_KEY_ALIAS" && test -n "$VC_UPLOAD_KEY_PASSWORD"
-          ./gradlew --no-daemon lintRelease bundleRelease
+          ./gradlew --no-daemon testDebugUnitTest lintRelease bundleRelease
       - run: python -m pip install -r scripts/requirements-play.txt
       - name: Upload internal draft
         env:

@@ -10,7 +10,8 @@ Vicious Cycle is an illustrated psychological crime story told in short passages
 • Inspect messages, news footage, medical documents and other clues.
 • Return to an earlier story fork after an ending, without route spoilers.
 • Adjustable text size and speed, dialogue history and reduced-motion support.
-• Entirely offline, with automatic saves on your device.
-• No ads, accounts, tracking or in-app purchases.
+• Offline story and artwork, with automatic saves on your device.
+• Full-screen native Android presentation, with no account or purchases.
+• Ads may appear between chapters; unavailable ads never interrupt progress.
 
 Contains adult characters, crime, intimidation and non-graphic violence. This game is not designed for children. There is no audio or timed decision-making. Progress is stored locally and is removed when you clear app data or uninstall.

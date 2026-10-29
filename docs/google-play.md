@@ -6,7 +6,7 @@ Application ID: `io.github.oneday1factboop.viciouscycle` · Version: `1.0.0` / c
 
 1. In your verified Google Play developer account, create a new **game**, using the English title **Vicious Cycle** and the Traditional Chinese title **惡性循環**. Enable Play App Signing. An existing listing must use its existing package ID and upload key instead.
 2. Complete the store listing using `store/`. Supply the required phone screenshots, a 512×512 icon and 1024×500 feature graphic after reviewing them. Choose the supported countries and pricing in Console.
-3. Set the privacy policy to the published `docs/privacy.html` page. The app collects/shares no user data, contains no ads, requires no login and offers no purchases. Review the Data safety answers yourself against this build.
+3. Set the privacy policy to the published `docs/privacy.html` page. The app contains ads, requires no login and offers no purchases. Local story saves are not transmitted to the publisher. Google Mobile Ads may collect/share advertising or device identifiers, approximate location from IP addresses, diagnostics and ad interactions; complete Data safety using the current SDK disclosure and actual AdMob configuration. Review the answers against the final build.
 4. Complete the IARC content rating accurately: crime, intimidation and non-graphic violence are present. Select a suitable adult target audience; do not invent a rating or declare the game suitable for children.
 5. Create an internal testing list and add your testers. Upload the signed `.aab` to an internal testing draft, then review and release it in Console when ready.
 
@@ -37,3 +37,13 @@ Keep an encrypted offline backup of the upload keystore and its passwords. Do no
 ## Device review
 
 Before releasing to testers, verify on a real Android phone: first launch offline; both languages; image and evidence dialogs; Back navigation; text size and reduced motion; rotation; save/resume after closing; an early ending and return to a story fork; and a full path to a final ending. Browser saves do not transfer automatically into the Android app.
+
+## AdMob setup
+
+Create an Android app in your AdMob account and create an interstitial ad unit. Set the repository Actions variables `VC_ADMOB_APP_ID` and `VC_ADMOB_INTERSTITIAL_ID` to these two IDs. Configure applicable consent messages in AdMob Privacy & messaging. Both variables must be supplied for live release ads; otherwise the bundle uses official test ads and earns no revenue. Debug always uses test ads.
+
+Ads appear only at player-initiated chapter transitions, at least three minutes apart. There are no banners over artwork and no ads on launch, decisions, ending recovery or exit. Story access never depends on an ad succeeding.
+
+Official integration references: https://developers.google.com/admob/android/quick-start · https://developers.google.com/admob/android/privacy · https://developers.google.com/admob/android/interstitial · https://developers.google.com/admob/android/privacy/play-data-disclosure
+
+The connected GitHub integration could push source but could not write Actions secrets or enable Pages. Add credentials in repository Settings → Secrets and variables → Actions. Publish `docs/privacy.html` through GitHub Pages (Settings → Pages, branch `main`, folder `/docs`) or your own public host before using its URL in Console.
