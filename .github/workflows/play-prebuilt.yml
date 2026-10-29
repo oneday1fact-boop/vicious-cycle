@@ -2,10 +2,10 @@ name: Upload prepared bundle to Play
 on:
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: 'Release containing the signed Android bundle'
+      bundle_ref:
+        description: 'Git ref containing the signed Android files'
         required: true
-        default: 'v1.0.0-android-preview'
+        default: 'android-builds'
 permissions:
   contents: read
 jobs:
@@ -20,17 +20,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Download and verify prepared bundle
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ inputs.release_tag }}
-          GAME_REPOSITORY: ${{ github.repository }}
+      - name: Download prepared files
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.bundle_ref }}
+          path: prebuilt
+      - name: Verify prepared bundle
         run: |
-          mkdir -p "$RUNNER_TEMP/play-upload"
-          gh release download "$RELEASE_TAG" --repo "$GAME_REPOSITORY" --pattern '*.aab' --pattern 'SHA256SUMS.txt' --dir "$RUNNER_TEMP/play-upload"
-          cd "$RUNNER_TEMP/play-upload"
+          cd prebuilt
           test -s vicious-cycle-1.0.0.aab
-          sha256sum --check --ignore-missing SHA256SUMS.txt
+          sha256sum --check SHA256SUMS.txt
           jarsigner -verify vicious-cycle-1.0.0.aab
       - name: Prepare private Play credential
         env:
@@ -43,8 +42,8 @@ jobs:
       - name: Upload internal draft
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/play-account.json
-          RELEASE_TAG: ${{ inputs.release_tag }}
-        run: python scripts/upload_play.py --bundle "$RUNNER_TEMP/play-upload/vicious-cycle-1.0.0.aab" --name "$RELEASE_TAG"
+          RELEASE_NAME: Native Android preview
+        run: python scripts/upload_play.py --bundle prebuilt/vicious-cycle-1.0.0.aab --name "$RELEASE_NAME"
       - name: Remove private credential
         if: always()
         run: rm -f "$RUNNER_TEMP/play-account.json"

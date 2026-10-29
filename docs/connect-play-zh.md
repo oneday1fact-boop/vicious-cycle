@@ -8,7 +8,7 @@ Android套件名稱：`io.github.oneday1factboop.viciouscycle`
 ## 最快開始內部試玩
 
 1. 登入[Google Play Console](https://play.google.com/console)，建立名為「Vicious Cycle」的新遊戲。
-2. 到儲存庫的[Releases](https://github.com/oneday1fact-boop/vicious-cycle/releases)，下載已簽署的`.aab`。
+2. [下載已簽署的AAB](https://github.com/oneday1fact-boop/vicious-cycle/raw/refs/heads/android-builds/vicious-cycle-1.0.0.aab)。
 3. 在Console建立「內部測試」版本，啟用Play App Signing，上傳該AAB，加入測試者並完成必要的帳戶及內容資料。
 
 APK供Android手機直接安裝；AAB供Google Play使用。試玩版包含Google官方測試廣告，不會產生廣告收入。
@@ -19,7 +19,7 @@ APK供Android手機直接安裝；AAB供Google Play使用。試玩版包含Googl
 2. 在[服務帳戶](https://console.cloud.google.com/iam-admin/serviceaccounts)建立帳戶。發佈本遊戲不需要給予Google Cloud Owner角色。
 3. 在Play Console「使用者與權限」邀請該服務帳戶的電郵，僅授予本遊戲所需的測試版本管理權限。
 4. 建立該服務帳戶的JSON金鑰，直接存入[GitHub Actions secrets](https://github.com/oneday1fact-boop/vicious-cycle/settings/secrets/actions)，名稱填寫`PLAY_SERVICE_ACCOUNT_JSON`。不要把JSON加入儲存庫、公開issue或聊天。
-5. 執行[Upload prepared bundle to Play](https://github.com/oneday1fact-boop/vicious-cycle/actions/workflows/play-prebuilt.yml)。它會下載Releases中的已簽署AAB、核對檔案校驗碼，並上傳至Google Play的內部測試草稿，毋須把上傳簽署金鑰交給這個流程。
+5. 執行[Upload prepared bundle to Play](https://github.com/oneday1fact-boop/vicious-cycle/actions/workflows/play-prebuilt.yml)。它會從`android-builds`下載分支取得已簽署AAB、核對檔案校驗碼，並上傳至Google Play的內部測試草稿，毋須把上傳簽署金鑰交給這個流程。
 
 新應用程式首次上傳可能必須先在Console手動完成。API不會代辦開發者身分驗證、建立最初的商店應用程式或填寫你的帳戶資料。上傳內部草稿亦不等於公開發佈。
 

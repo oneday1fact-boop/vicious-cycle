@@ -4,7 +4,7 @@ An illustrated, branching psychological crime story for Android, with complete E
 
 ## Native Android game
 
-Install the APK from this repository's Releases page. The debug APK installs alongside the release app. Android 8.0 or later and an up-to-date Android System WebView are required. The story and artwork run offline. Ads use a network connection when available. Progress, reading preferences and collected endings remain on the device; uninstalling or clearing app data removes them.
+[Download the signed APK](https://github.com/oneday1fact-boop/vicious-cycle/raw/refs/heads/android-builds/vicious-cycle-1.0.0.apk) and install it on your phone. [Google Play AAB](https://github.com/oneday1fact-boop/vicious-cycle/raw/refs/heads/android-builds/vicious-cycle-1.0.0.aab). The debug APK installs alongside the release app. Android 8.0 or later and an up-to-date Android System WebView are required. The story and artwork run offline. Ads use a network connection when available. Progress, reading preferences and collected endings remain on the device; uninstalling or clearing app data removes them.
 
 The game is rendered by native Android Views and Canvas, with immersive full-screen artwork, progressive dialogue and native evidence dialogs. No WebView, HTML page or browser is used for the game interface. Swipe from the screen edge to reveal system bars. Android Back dismisses panels or returns to the cover without discarding progress.
 
@@ -56,4 +56,4 @@ The bundled poster font is a Noto Sans CJK subset; its license is in `game/asset
 
 ## Release status
 
-The first Android build uses test ads. Signed APK and AAB builds are available in Releases. Native engine tests, Android lint and release signing verification passed. Physical Android device testing and live ad delivery have not yet been verified. Google Play publisher credentials and real AdMob IDs have not been connected. The source repository is public; that does not imply a Google Play release has been uploaded or approved.
+The first Android build uses test ads. Signed APK and AAB builds are available on the `android-builds` branch. Native engine tests, Android lint and release signing verification passed. Physical Android device testing and live ad delivery have not yet been verified. Google Play publisher credentials and real AdMob IDs have not been connected. The source repository is public; that does not imply a Google Play release has been uploaded or approved.
