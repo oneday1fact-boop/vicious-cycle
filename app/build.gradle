@@ -1,0 +1,55 @@
+plugins { id 'com.android.application' }
+
+def releaseKeys = ['VC_UPLOAD_KEYSTORE', 'VC_UPLOAD_STORE_PASSWORD', 'VC_UPLOAD_KEY_ALIAS', 'VC_UPLOAD_KEY_PASSWORD']
+def hasReleaseKeys = releaseKeys.every { System.getenv(it) }
+
+android {
+    namespace 'io.github.oneday1factboop.viciouscycle'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'io.github.oneday1factboop.viciouscycle'
+        minSdk 26
+        targetSdk 36
+        versionCode (System.getenv('VC_VERSION_CODE') ?: '1').toInteger()
+        versionName (System.getenv('VC_VERSION_NAME') ?: '1.0.0')
+        resConfigs 'en', 'zh-rTW', 'zh-rHK'
+    }
+    signingConfigs {
+        if (hasReleaseKeys) {
+            release {
+                storeFile file(System.getenv('VC_UPLOAD_KEYSTORE'))
+                storePassword System.getenv('VC_UPLOAD_STORE_PASSWORD')
+                keyAlias System.getenv('VC_UPLOAD_KEY_ALIAS')
+                keyPassword System.getenv('VC_UPLOAD_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        debug { applicationIdSuffix '.debug'; versionNameSuffix '-debug' }
+        release {
+            if (hasReleaseKeys) signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildFeatures { buildConfig true }
+    sourceSets.main.assets.srcDir layout.buildDirectory.dir('generated/gameAssets')
+    lint { abortOnError true; checkReleaseBuilds true }
+}
+
+tasks.register('syncGameAssets', Sync) {
+    from(rootProject.file('game')) {
+        include 'index.html', '*.js', '*.css', 'assets/**'
+        exclude 'verify.cjs'
+    }
+    into layout.buildDirectory.dir('generated/gameAssets/game')
+}
+tasks.named('preBuild').configure { dependsOn 'syncGameAssets' }
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.14.0'
+}
