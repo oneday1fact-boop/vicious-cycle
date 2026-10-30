@@ -14,15 +14,21 @@ public final class StoryEngine {
     public JSONObject state;
     public String language;
     public StoryEngine(JSONObject data, String language, JSONObject saved) {
-        this.data = data; this.language = language;
+        this.data = data; this.language = GameLanguage.normalize(language);
+        if(!data.optJSONObject("languages").has(this.language))this.language="en";
         state = saved != null && story().has(saved.optString("id")) ? copy(saved) : fresh();
     }
     public JSONObject story() { return data.optJSONObject("languages").optJSONObject(language).optJSONObject("story"); }
     public JSONObject locale() { return data.optJSONObject("languages").optJSONObject(language); }
     public String ui(String key) {
+        JSONObject translated=locale().optJSONObject("ui");
+        if(translated!=null&&translated.has(key))return translated.optString(key);
         JSONArray pair = data.optJSONObject("ui").optJSONArray(key);
-        return pair == null ? key : pair.optString(language.equals("en") ? 1 : 0, key);
+        return pair == null ? key : pair.optString(language.equals("zh") ? 0 : 1, key);
     }
+    public String label(String english){JSONObject labels=locale().optJSONObject("nativeUi");return labels==null?english:labels.optString(english,english);}
+    public String translated(String traditional,String english){return language.equals("zh")?traditional:label(english);}
+    public String artDescription(String key){JSONObject descriptions=locale().optJSONObject("art");return descriptions==null?data.optJSONObject("artEnglish").optString(key,"Scene illustration"):descriptions.optString(key,"Scene illustration");}
     public JSONObject fresh() {
         JSONObject s = new JSONObject();
         put(s,"id", data.optString("start"));

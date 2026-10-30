@@ -42,6 +42,11 @@ def main():
         sheet.save(OUT / f'all-65-{label}.jpg', quality=92)
     for key in ['bar', 'underpass', 'cover', 'television', 'evidenceTable']:
         render(next(e for e in entries if e['key'] == key and e['viewport'] == [392, 420])).save(OUT / f'{key}-phone.png')
+    cover_report = REPORT.with_name('cover-layout.json')
+    if cover_report.exists():
+        for item in json.loads(cover_report.read_text()):
+            w, h = item['viewport']
+            render(item).save(OUT / f'full-screen-cover-{w}x{h}.png')
     print(f'650 native geometry checks; 65 illustrations in four inspection sheets: {OUT}')
 
 

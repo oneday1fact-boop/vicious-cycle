@@ -29,9 +29,9 @@ public class StoryEngineTest {
         }
         fail("Route did not terminate");
     }
-    @Test public void allTenEndingsRunInBothLanguagesAndRecoverAcrossChapters()throws Exception{
+    @Test public void allTenEndingsRunInAllLanguageTemplatesAndRecoverAcrossChapters()throws Exception{
         JSONObject data=data();int endingCount=0;
-        for(String language:new String[]{"zh","en"}){
+        for(String language:GameLanguage.CODES){
             StoryEngine source=new StoryEngine(data,language,null);
             for(Iterator<String> it=source.story().keys();it.hasNext();){String id=it.next();if(!source.story().optJSONObject(id).has("ending"))continue;
                 endingCount++;StoryEngine engine=new StoryEngine(data,language,null);engine.start();
@@ -48,7 +48,7 @@ public class StoryEngineTest {
                 assertTrue(engine.retry());assertTrue(engine.node().has("choices"));
             }
         }
-        assertEquals(20,endingCount);
+        assertEquals(60,endingCount);
     }
     @Test public void nativeDataIsCompleteAndLanguageDoesNotChangeProgress()throws Exception{
         StoryEngine e=new StoryEngine(data(),"zh",null);e.start();assertEquals(167,e.story().length());String state=e.state.toString();e.language="en";assertEquals(state,e.state.toString());assertEquals("Vicious Cycle",e.ui("title"));assertFalse(e.node().optString("text").matches(".*[\\u4e00-\\u9fff].*"));assertEquals(65,e.data.optJSONObject("art").length());

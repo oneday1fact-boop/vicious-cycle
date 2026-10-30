@@ -53,4 +53,17 @@ public class ArtworkLayoutTest {
         ArtworkLayout.Bounds previous=ArtworkLayout.fit(1001,701,3,2,1,1,300,600);
         assertEquals(previous.sourceRight,b.sourceLeft);
     }
+    @Test public void fullScreenCoverAlwaysFillsTheScreenWithoutAffectingStoryFit()throws Exception{
+        JSONArray report=new JSONArray();
+        for(int[] viewport:new int[][]{{320,480},{360,800},{1080,2400},{800,360},{800,1280}}){
+            ArtworkLayout.Bounds cover=ArtworkLayout.cover(1672,941,viewport[0],viewport[1]);
+            assertTrue(cover.left<=.001&&cover.top<=.001&&cover.right>=viewport[0]-.001&&cover.bottom>=viewport[1]-.001);
+            assertEquals(1672d/941,(cover.right-cover.left)/(cover.bottom-cover.top),.00001);
+            float eye=cover.left+.84f*(cover.right-cover.left);assertTrue("Keep the cover's eye visible",eye>=0&&eye<=viewport[0]);
+            JSONObject entry=new JSONObject();entry.put("file","assets/creepy-cover.png");entry.put("viewport",new JSONArray(viewport));entry.put("source",new JSONArray(new int[]{0,0,1672,941}));entry.put("destination",new JSONArray(new float[]{cover.left,cover.top,cover.right,cover.bottom}));report.put(entry);
+            ArtworkLayout.Bounds story=ArtworkLayout.fit(1536,1024,3,2,0,0,viewport[0],viewport[1]);
+            assertTrue(story.left>=-.001&&story.top>=-.001&&story.right<=viewport[0]+.001&&story.bottom<=viewport[1]+.001);
+        }
+        String path=System.getProperty("vc.art.report");if(path!=null){Path output=Paths.get(path).getParent().resolve("cover-layout.json");Files.createDirectories(output.getParent());Files.write(output,report.toString(2).getBytes(StandardCharsets.UTF_8));}
+    }
 }

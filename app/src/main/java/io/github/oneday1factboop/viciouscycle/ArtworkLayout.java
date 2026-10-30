@@ -20,4 +20,14 @@ final class ArtworkLayout {
         return new Bounds(sl,st,sr,sb,(width-drawnWidth)/2,(height-drawnHeight)/2,
                 (width+drawnWidth)/2,(height+drawnHeight)/2);
     }
+    /** Full-bleed presentation is reserved for the title screen's standalone cover. */
+    static Bounds cover(int imageWidth,int imageHeight,int width,int height){
+        if(imageWidth<1||imageHeight<1||width<1||height<1)throw new IllegalArgumentException("Invalid cover viewport");
+        float scale=Math.max(width/(float)imageWidth,height/(float)imageHeight);
+        float drawnWidth=imageWidth*scale,drawnHeight=imageHeight*scale;
+        // The face is on the right of the landscape master; preserve it on a phone.
+        float left=Math.min(0,Math.max(width-drawnWidth,width*.68f-drawnWidth*.84f));
+        float top=(height-drawnHeight)/2;
+        return new Bounds(0,0,imageWidth,imageHeight,left,top,left+drawnWidth,top+drawnHeight);
+    }
 }

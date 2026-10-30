@@ -28,9 +28,9 @@ jobs:
       - name: Verify prepared bundle
         run: |
           cd prebuilt
-          test -s vicious-cycle-1.0.1.aab
+          test -s vicious-cycle-1.1.0.aab
           sha256sum --check SHA256SUMS.txt
-          jarsigner -verify vicious-cycle-1.0.1.aab
+          jarsigner -verify vicious-cycle-1.1.0.aab
       - name: Prepare private Play credential
         env:
           PLAY_ACCOUNT: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
@@ -42,8 +42,8 @@ jobs:
       - name: Upload internal draft
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/play-account.json
-          RELEASE_NAME: 1.0.1 artwork fix
-        run: python scripts/upload_play.py --bundle prebuilt/vicious-cycle-1.0.1.aab --name "$RELEASE_NAME"
+          RELEASE_NAME: 1.1.0 Audio and languages
+        run: python scripts/upload_play.py --bundle prebuilt/vicious-cycle-1.1.0.aab --name "$RELEASE_NAME"
       - name: Remove private credential
         if: always()
         run: rm -f "$RUNNER_TEMP/play-account.json"

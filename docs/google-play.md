@@ -1,8 +1,8 @@
 # Google Play internal testing
 
-Application ID: `io.github.oneday1factboop.viciouscycle` · Version: `1.0.1` / code `2` · Target SDK: `36` · Minimum Android: `8.0`.
+Application ID: `io.github.oneday1factboop.viciouscycle` · Version: `1.1.0` / code `3` · Target SDK: `36` · Minimum Android: `8.0`.
 
-Version 1.0.0 is already active in internal testing. Upload 1.0.1 to the same app and track as a new release; do not create another app. Keep the existing tester list selected.
+Version 1.0.1 is already active in internal testing. Upload 1.1.0 to the same app and track as a new release; do not create another app. Keep the existing tester list selected.
 
 ## Console preparation
 
@@ -49,3 +49,5 @@ Ads appear only at player-initiated chapter transitions, at least three minutes 
 Official integration references: https://developers.google.com/admob/android/quick-start · https://developers.google.com/admob/android/privacy · https://developers.google.com/admob/android/interstitial · https://developers.google.com/admob/android/privacy/play-data-disclosure
 
 The connected GitHub integration could push source but could not write Actions secrets or enable Pages. Add credentials in repository Settings → Secrets and variables → Actions. Publish `docs/privacy.html` through GitHub Pages (Settings → Pages, branch `main`, folder `/docs`) or your own public host before using its URL in Console.
+
+Version 1.1.0 includes Google ML Kit on-device translation. Model downloads may send network/device information and diagnostics to Google; story translation runs locally. Review the current ML Kit SDK disclosure alongside the Ads disclosure when completing Data safety. Japanese, Spanish and French story packs are automatically prepared on first use and cached.

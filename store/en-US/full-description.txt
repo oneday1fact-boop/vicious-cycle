@@ -5,13 +5,18 @@ You are Long, the leader of a street gang. A witness raises a phone in a dark tu
 Vicious Cycle is an illustrated psychological crime story told in short passages, with interactive scenes, evidence cards and consequential decisions.
 
 • A complete five-chapter story with ten endings.
-• English and written Traditional Chinese, switchable during play.
+• English, Traditional Chinese and Simplified Chinese.
+• Japanese, Spanish and French story packs, prepared on device after a one-time language download.
 • Distinctive orange-and-black artwork and animated scene effects.
 • Inspect messages, news footage, medical documents and other clues.
 • Return to an earlier story fork after an ending, without route spoilers.
 • Adjustable text size and speed, dialogue history and reduced-motion support.
 • Offline story and artwork, with automatic saves on your device.
-• Full-screen native Android presentation, with no account or purchases.
+• A full-screen illustrated cover with native Android controls.
+• Original background music, soft button sounds and story haptics, each with separate settings.
+• No account or purchases.
 • Ads may appear between chapters; unavailable ads never interrupt progress.
 
-Contains adult characters, crime, intimidation and non-graphic violence. This game is not designed for children. There is no audio or timed decision-making. Progress is stored locally and is removed when you clear app data or uninstall.
+Contains adult characters, crime, intimidation and non-graphic violence. This game is not designed for children. There are no timed decisions. Music, sound effects and vibration can be switched off. Progress is stored locally and is removed when you clear app data or uninstall.
+
+Japanese, Spanish and French story text uses automatic translation powered by Google Translate (https://cloud.google.com/translate). Interface text is bundled. Download and prepare a story pack once to read every chapter and ending offline. Changing languages preserves progress.

@@ -1,1 +1,1 @@
-All illustrations now retain their complete composition without zooming or cropping. Dialogue and controls have their own panel, and landscape mode places the picture beside the story. Includes fixes for scene illustrations, evidence cards, the cover and ending gallery.
+Full-screen cover with overlaid controls. Added original background music, button sounds and story haptics with independent settings. Added Simplified Chinese and on-device Japanese, Spanish and French story packs. Download a language once for offline play; progress is preserved when switching.

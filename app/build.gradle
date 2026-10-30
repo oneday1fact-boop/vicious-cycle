@@ -17,9 +17,9 @@ android {
         applicationId 'io.github.oneday1factboop.viciouscycle'
         minSdk 26
         targetSdk 36
-        versionCode = (System.getenv('VC_VERSION_CODE') ?: '2').toInteger()
-        versionName = System.getenv('VC_VERSION_NAME') ?: '1.0.1'
-        resConfigs 'en', 'zh-rTW', 'zh-rHK'
+        versionCode = (System.getenv('VC_VERSION_CODE') ?: '3').toInteger()
+        versionName = System.getenv('VC_VERSION_NAME') ?: '1.1.0'
+        resConfigs 'en', 'zh-rTW', 'zh-rHK', 'zh-rCN', 'ja', 'es', 'fr'
         manifestPlaceholders = [admobAppId: 'ca-app-pub-3940256099942544~3347511713']
         buildConfigField 'boolean', 'TEST_ADS', 'true'
         buildConfigField 'String', 'ADMOB_INTERSTITIAL_ID', '"ca-app-pub-3940256099942544/1033173712"'
@@ -51,6 +51,10 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     buildFeatures { buildConfig true }
+    // Play receives the complete AAB; direct APKs contain only their device ABI.
+    splits {
+        abi { enable true; reset(); include 'arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86'; universalApk false }
+    }
     sourceSets.main.assets.srcDir layout.buildDirectory.dir('generated/gameAssets')
     lint { abortOnError true; checkReleaseBuilds true }
     testOptions.unitTests.all {
@@ -71,6 +75,7 @@ dependencies {
     implementation 'androidx.activity:activity:1.11.0'
     implementation 'com.google.android.gms:play-services-ads:25.5.0'
     implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
+    implementation 'com.google.mlkit:translate:17.0.3'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20240303'
 }

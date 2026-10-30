@@ -24,7 +24,9 @@ public final class SceneView extends View {
     private String file="";
     private float opacity=1;
     private ValueAnimator animation;
+    private boolean fullScreenCover;
     public SceneView(Context context){super(context);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);}
+    public void fullScreenCover(){fullScreenCover=true;invalidate();}
     public void scene(JSONObject source,String description,boolean motion){
         frame=source;setContentDescription(description);String next=source.optString("file");file=next;
         if(animation!=null)animation.cancel();opacity=motion?.7f:1;
@@ -45,7 +47,7 @@ public final class SceneView extends View {
     @Override protected void onDraw(Canvas canvas){
         super.onDraw(canvas);canvas.drawColor(Color.rgb(23,19,16));
         if(bitmap==null||frame==null||getWidth()<1||getHeight()<1)return;
-        ArtworkLayout.Bounds bounds=ArtworkLayout.fit(bitmap.getWidth(),bitmap.getHeight(),
+        ArtworkLayout.Bounds bounds=fullScreenCover?ArtworkLayout.cover(bitmap.getWidth(),bitmap.getHeight(),getWidth(),getHeight()):ArtworkLayout.fit(bitmap.getWidth(),bitmap.getHeight(),
                 frame.optInt("cols",1),frame.optInt("rows",1),frame.optInt("col"),frame.optInt("row"),getWidth(),getHeight());
         destination.set(bounds.left,bounds.top,bounds.right,bounds.bottom);
         sourceRect.set(bounds.sourceLeft,bounds.sourceTop,bounds.sourceRight,bounds.sourceBottom);

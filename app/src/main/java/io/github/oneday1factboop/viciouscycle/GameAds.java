@@ -10,11 +10,12 @@ import com.google.android.ump.*;
 /** Ads appear only after a player taps Continue at a chapter break. */
 public final class GameAds {
     private final Activity activity;
+    private final Runnable onAdStart,onAdEnd;
     private ConsentInformation consent;
     private InterstitialAd interstitial;
     private boolean initialized,loading;
     private long lastShown=SystemClock.elapsedRealtime();
-    public GameAds(Activity activity){this.activity=activity;}
+    public GameAds(Activity activity,Runnable onAdStart,Runnable onAdEnd){this.activity=activity;this.onAdStart=onAdStart;this.onAdEnd=onAdEnd;}
     public void start(){
         if(BuildConfig.TEST_ADS){initialize();return;}
         consent=UserMessagingPlatform.getConsentInformation(activity);
@@ -47,10 +48,10 @@ public final class GameAds {
         interstitial=null;
         ad.setFullScreenContentCallback(new FullScreenContentCallback(){
             private boolean completed;
-            private void finish(){if(completed)return;completed=true;next.run();load();}
+            private void finish(){if(completed)return;completed=true;onAdEnd.run();next.run();load();}
             @Override public void onAdDismissedFullScreenContent(){finish();}
             @Override public void onAdFailedToShowFullScreenContent(AdError error){finish();}
-            @Override public void onAdShowedFullScreenContent(){lastShown=SystemClock.elapsedRealtime();}
+            @Override public void onAdShowedFullScreenContent(){lastShown=SystemClock.elapsedRealtime();onAdStart.run();}
         });
         ad.show(activity);
     }
