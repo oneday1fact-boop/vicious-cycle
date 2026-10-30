@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/** Renders a cropped illustration directly on an Android Canvas. */
+/** Displays a complete illustration on an Android Canvas, with optional fade-in. */
 public final class SceneView extends View {
     private static final ExecutorService DECODER=Executors.newSingleThreadExecutor();
     private static final LruCache<String,Bitmap> CACHE=new LruCache<String,Bitmap>(24*1024*1024){
@@ -19,16 +19,16 @@ public final class SceneView extends View {
     private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final Rect sourceRect=new Rect();
     private final RectF destination=new RectF();
-    private Shader vignette;
     private JSONObject frame;
     private Bitmap bitmap;
     private String file="";
-    private float zoom=1;
+    private float opacity=1;
     private ValueAnimator animation;
     public SceneView(Context context){super(context);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);}
     public void scene(JSONObject source,String description,boolean motion){
         frame=source;setContentDescription(description);String next=source.optString("file");file=next;
-        if(animation!=null)animation.cancel();zoom=motion?1.035f:1;
+        if(animation!=null)animation.cancel();opacity=motion?.7f:1;
+        bitmap=null;
         Bitmap cached=CACHE.get(next);
         if(cached!=null){bitmap=cached;invalidate();}
         else DECODER.execute(()->{
@@ -40,21 +40,16 @@ public final class SceneView extends View {
             final Bitmap result=decoded;if(result!=null)CACHE.put(next,result);
             post(()->{if(file.equals(next)){bitmap=result;invalidate();}});
         });
-        if(motion){animation=ValueAnimator.ofFloat(1.035f,1f);animation.setDuration(1100);animation.addUpdateListener(a->{zoom=(float)a.getAnimatedValue();invalidate();});animation.start();}
+        if(motion){animation=ValueAnimator.ofFloat(.7f,1f);animation.setDuration(450);animation.addUpdateListener(a->{opacity=(float)a.getAnimatedValue();invalidate();});animation.start();}
     }
     @Override protected void onDraw(Canvas canvas){
         super.onDraw(canvas);canvas.drawColor(Color.rgb(23,19,16));
-        if(bitmap==null||frame==null)return;
-        int cellW=bitmap.getWidth()/frame.optInt("cols",1),cellH=bitmap.getHeight()/frame.optInt("rows",1);
-        int left=frame.optInt("col")*cellW,top=frame.optInt("row")*cellH;
-        float ratio=Math.max(getWidth()/(float)cellW,getHeight()/(float)cellH)*zoom;
-        float width=cellW*ratio,height=cellH*ratio;
-        destination.set((getWidth()-width)/2,(getHeight()-height)/2,(getWidth()+width)/2,(getHeight()+height)/2);
-        sourceRect.set(left,top,left+cellW,top+cellH);
-        paint.setShader(null);canvas.drawBitmap(bitmap,sourceRect,destination,paint);
-        paint.setShader(vignette);
-        canvas.drawRect(0,0,getWidth(),getHeight(),paint);paint.setShader(null);
+        if(bitmap==null||frame==null||getWidth()<1||getHeight()<1)return;
+        ArtworkLayout.Bounds bounds=ArtworkLayout.fit(bitmap.getWidth(),bitmap.getHeight(),
+                frame.optInt("cols",1),frame.optInt("rows",1),frame.optInt("col"),frame.optInt("row"),getWidth(),getHeight());
+        destination.set(bounds.left,bounds.top,bounds.right,bounds.bottom);
+        sourceRect.set(bounds.sourceLeft,bounds.sourceTop,bounds.sourceRight,bounds.sourceBottom);
+        paint.setAlpha(Math.round(255*opacity));canvas.drawBitmap(bitmap,sourceRect,destination,paint);
     }
-    @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){super.onSizeChanged(w,h,oldw,oldh);if(h>0)vignette=new LinearGradient(0,0,0,h,new int[]{0x99000000,0x08000000,0xE8171310},new float[]{0,.4f,1},Shader.TileMode.CLAMP);}
     @Override protected void onDetachedFromWindow(){if(animation!=null)animation.cancel();super.onDetachedFromWindow();}
 }

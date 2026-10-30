@@ -5,11 +5,11 @@ on:
       version_code:
         description: 'New version code (higher than every previous upload)'
         required: true
-        default: '1'
+        default: '2'
       version_name:
         description: 'Display version'
         required: true
-        default: '1.0.0'
+        default: '1.0.1'
 permissions:
   contents: read
 jobs:

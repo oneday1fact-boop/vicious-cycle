@@ -3,13 +3,14 @@
 遊戲名稱：**惡性循環 / Vicious Cycle**  
 Android套件名稱：`io.github.oneday1factboop.viciouscycle`
 
-目前GitHub已連接，但Google Play及AdMob尚未授權。GitHub連接可推送原始碼，無權代你新增Actions secrets。帳戶首次授權需要由你在Google及GitHub的登入頁面完成，毋須在聊天提供密碼或私密金鑰。
+目前1.0.0已在Google Play內部測試發佈。1.0.1（版本代碼2）修正全部圖片的放大裁切問題；需要上傳新的AAB，測試者才會收到更新。自動API上傳及正式AdMob廣告尚未設定。
 
-## 最快開始內部試玩
+## 更新現有內部測試
 
-1. 登入[Google Play Console](https://play.google.com/console)，建立名為「Vicious Cycle」的新遊戲。
-2. [下載已簽署的AAB](https://github.com/oneday1fact-boop/vicious-cycle/raw/refs/heads/android-builds/vicious-cycle-1.0.0.aab)。
-3. 在Console建立「內部測試」版本，啟用Play App Signing，上傳該AAB，加入測試者並完成必要的帳戶及內容資料。
+1. [下載1.0.1已簽署AAB](https://github.com/oneday1fact-boop/vicious-cycle/raw/refs/heads/android-builds/vicious-cycle-1.0.1.aab)。
+2. 開啟現有「Vicious Cycle」的內部測試，建立新版本，上傳此AAB。沿用現有應用程式、套件名稱、簽署及測試名單。
+3. 核對版本代碼為2、版本名稱為1.0.1，填寫新版說明並儲存、檢查及發佈至內部測試。
+4. 測試者使用已加入名單的Google帳戶開啟[內部測試連結](https://play.google.com/apps/internaltest/4699937056777486793)，到Google Play更新並核對版本為1.0.1。
 
 APK供Android手機直接安裝；AAB供Google Play使用。試玩版包含Google官方測試廣告，不會產生廣告收入。
 

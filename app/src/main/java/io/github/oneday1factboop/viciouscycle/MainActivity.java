@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity;
 import androidx.activity.OnBackPressedCallback;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -85,7 +86,7 @@ public final class MainActivity extends ComponentActivity {
     private void base(String nextScreen,String scene){
         stopTyping();screen=nextScreen;
         root=new FrameLayout(this);root.setBackgroundColor(INK);
-        artwork=new SceneView(this);paint(artwork,scene,true);root.addView(artwork,new FrameLayout.LayoutParams(-1,-1));
+        artwork=new SceneView(this);paint(artwork,scene,true);
         content=column();content.setPadding(dp(20),dp(12),dp(20),dp(12));root.addView(content,new FrameLayout.LayoutParams(-1,-1));
         content.setOnApplyWindowInsetsListener((view,insets)->{
             int left=0,top=0,right=0,bottom=0;
@@ -104,38 +105,47 @@ public final class MainActivity extends ComponentActivity {
         TextView caption=text(label,12,MUTED);caption.setMaxLines(2);row.addView(caption,new LinearLayout.LayoutParams(0,-2,1));
         Button menu=button("☰",this::openMenu,false);menu.setContentDescription(ui("gameMenu"));row.addView(menu,new LinearLayout.LayoutParams(dp(52),dp(48)));content.addView(row);
     }
-    private void spacer(float weight){content.addView(new View(this),new LinearLayout.LayoutParams(1,0,weight));}
     private ScrollView scroll(LinearLayout child){ScrollView s=new ScrollView(this);s.setFillViewport(false);s.setClipToPadding(false);s.addView(child);return s;}
+    private void present(LinearLayout panel){
+        // Artwork has its own unobscured viewport; dialogue and controls never cover it.
+        boolean wide=getResources().getConfiguration().orientation==Configuration.ORIENTATION_LANDSCAPE;
+        LinearLayout body=new LinearLayout(this);body.setOrientation(wide?LinearLayout.HORIZONTAL:LinearLayout.VERTICAL);
+        body.addView(artwork,new LinearLayout.LayoutParams(wide?0:-1,wide?-1:0,1f));
+        ScrollView reading=scroll(panel);
+        LinearLayout.LayoutParams readingParams=new LinearLayout.LayoutParams(wide?0:-1,wide?-1:0,1.05f);
+        if(wide)readingParams.setMargins(dp(12),0,0,0);else readingParams.setMargins(0,dp(10),0,0);
+        body.addView(reading,readingParams);content.addView(body,new LinearLayout.LayoutParams(-1,0,1));
+    }
     private void renderCover(){
-        base("cover","cover");header(tr("互動故事","INTERACTIVE FICTION"));spacer(1);
+        base("cover","cover");header(tr("互動故事","INTERACTIVE FICTION"));
         LinearLayout panel=column();panel.addView(text(ui("kicker"),14,PAPER));
         TextView title=text(english()?"VICIOUS\nCYCLE":"惡性\n循環",english()?51:65,ORANGE);title.setTypeface(Typeface.create("sans-serif-condensed",Typeface.BOLD));title.setLetterSpacing(.08f);title.setLineSpacing(0,.86f);panel.addView(title);
         panel.addView(text(ui("tagline"),16,PAPER));panel.addView(button(ui("start"),()->{introPart=0;renderIntro();},true));
         if(hasSave)panel.addView(button(ui("resume"),this::renderGame,false));
-        content.addView(panel);TextView foot=text(ui("coverFoot"),11,MUTED);content.addView(foot);
+        panel.addView(text(ui("coverFoot"),11,MUTED));present(panel);
     }
     private void renderIntro(){
-        base("intro","bar");header(ui("background"));spacer(1);
+        base("intro","bar");header(ui("background"));
         LinearLayout panel=column();panel.setPadding(dp(14),dp(12),dp(14),dp(12));panel.setBackground(box(0xE8171310,0));
         panel.addView(text(ui("intro"+(introPart+1)+"Title"),28,ORANGE));panel.addView(text(ui("intro"+(introPart+1)),textSize,PAPER));panel.addView(text((introPart+1)+" / 2",12,MUTED));
         panel.addView(button(introPart==0?ui("continue"):ui("enter"),()->{if(introPart==0){introPart=1;renderIntro();}else{engine.start();save();renderGame();}},true));panel.addView(text(ui("contentNote"),12,MUTED));
-        ScrollView area=scroll(panel);content.addView(area,new LinearLayout.LayoutParams(-1,0,1.25f));
+        present(panel);
     }
     private void renderGame(){
         JSONObject n=engine.node();if(n.has("ending")){renderEnding();return;}
         base("game",n.optString("scene","cover"));header(n.optString("section"));
-        FrameLayout objects=new FrameLayout(this);content.addView(objects,new LinearLayout.LayoutParams(-1,0,1f));
-        String cue=n.optString("cue");if(!cue.isEmpty()){TextView c=text(cue,19,ORANGE);c.setTypeface(null,Typeface.BOLD);objects.addView(c,new FrameLayout.LayoutParams(-2,-2,Gravity.TOP|Gravity.CENTER_HORIZONTAL));}
-        LinearLayout hotspots=column();FrameLayout.LayoutParams hotParams=new FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM);objects.addView(hotspots,hotParams);
+        LinearLayout hotspots=column();
         if(n.has("extra")){JSONObject extra=n.optJSONObject("extra");hotspots.addView(button("◉  "+extra.optString("label"),()->openInfo(extra,false),false));}
         JSONArray spots=n.optJSONArray("hotspots");if(spots!=null)for(int i=0;i<spots.length();i++){JSONObject h=spots.optJSONObject(i);hotspots.addView(button("◉  "+h.optString("label"),()->openInfo(h,false),false));}
         if(n.has("action")){JSONObject action=n.optJSONObject("action");hotspots.addView(button("◈  "+action.optString("label"),()->openInfo(action,true),!engine.actionDone()));}
         LinearLayout panel=column();panel.setPadding(dp(14),dp(10),dp(14),dp(12));panel.setBackground(box(0xED171310,0));
+        String cue=n.optString("cue");if(!cue.isEmpty()){TextView c=text(cue,19,ORANGE);c.setTypeface(null,Typeface.BOLD);panel.addView(c);}
+        panel.addView(hotspots);
         JSONObject line=engine.variant(n);String who=line.optString("who");if(!who.isEmpty())panel.addView(text(who,13,ORANGE));
         passage=text("",textSize,PAPER);passage.setFocusable(true);passage.setContentDescription(ui("reveal"));passage.setOnClickListener(v->{if(typing)reveal();});panel.addView(passage);
         if(n.has("overwrite")){JSONObject o=n.optJSONObject("overwrite");panel.addView(text(ui("chosen")+" · "+o.optString("from")+"\n"+ui("bodyResponse")+" · "+o.optString("to"),16,ORANGE));panel.addView(text(o.optString("reason"),14,MUTED));}
         controls=column();panel.addView(controls);
-        ScrollView area=scroll(panel);content.addView(area,new LinearLayout.LayoutParams(-1,0,1.05f));
+        present(panel);
         pending=line.optString("text");visibleCharacters=0;
         if(speed==0||!motion())reveal();else{
             typing=true;controls.addView(button(ui("showAll"),this::reveal,false));
@@ -164,7 +174,7 @@ public final class MainActivity extends ComponentActivity {
     }
     private void renderEnding(){
         JSONObject n=engine.node(),e=engine.variant(n.optJSONObject("ending"));String id=engine.state.optString("id");boolean known=false;for(int i=0;i<collection.length();i++)if(id.equals(collection.optString(i)))known=true;if(!known)collection.put(id);
-        base("ending",e.optString("scene","cover"));header(ui("ending"));spacer(1);
+        base("ending",e.optString("scene","cover"));header(ui("ending"));
         LinearLayout panel=column();panel.setPadding(dp(14),dp(12),dp(14),dp(12));panel.setBackground(box(0xE8171310,0));
         TextView stamp=text(ui("ending"),35,ORANGE);stamp.setTypeface(null,Typeface.BOLD);panel.addView(stamp);panel.addView(text(e.optString("title"),25,PAPER));
         JSONArray paragraphs=e.optJSONArray("paragraphs");int part=Math.min(engine.state.optInt("part"),paragraphs.length()-1);panel.addView(text(paragraphs.optString(part),textSize,PAPER));panel.addView(text((part+1)+" / "+paragraphs.length(),12,MUTED));
@@ -174,7 +184,7 @@ public final class MainActivity extends ComponentActivity {
             if(engine.state.optJSONArray("trail").length()>0)panel.addView(button(ui("retry"),()->{engine.retry();save();renderGame();},false));
             panel.addView(button(ui("restart"),()->confirmRestart(),false));panel.addView(button(ui("backCover"),this::renderCover,false));
         }
-        content.addView(scroll(panel),new LinearLayout.LayoutParams(-1,0,1.3f));save();
+        present(panel);save();
     }
     private void showDialog(String title,LinearLayout panel,String positive,Runnable action){
         if(activeDialog!=null)activeDialog.dismiss();panel.setPadding(dp(18),dp(8),dp(18),dp(12));
@@ -241,5 +251,6 @@ public final class MainActivity extends ComponentActivity {
         new AlertDialog.Builder(this).setTitle(tr("離開遊戲？","Leave the game?")).setNegativeButton(tr("繼續遊戲","Keep playing"),null).setPositiveButton(tr("離開","Leave"),(d,w)->finish()).show();
     }
     @Override protected void onPause(){if(engine!=null&&hasSave)save();super.onPause();}
+    @Override public void onConfigurationChanged(Configuration configuration){super.onConfigurationChanged(configuration);if(engine!=null){dismissDialog();renderCurrent();}}
     @Override protected void onDestroy(){stopTyping();super.onDestroy();}
 }

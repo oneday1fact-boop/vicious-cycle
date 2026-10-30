@@ -1,1 +1,1 @@
-First Android edition: a complete five-chapter story, ten endings, illustrated choices, interactive evidence, English and written Traditional Chinese, offline saves and spoiler-free story-fork recovery. Native full-screen presentation with test ads between chapters.
+All illustrations now retain their complete composition without zooming or cropping. Dialogue and controls have their own panel, and landscape mode places the picture beside the story. Includes fixes for scene illustrations, evidence cards, the cover and ending gallery.

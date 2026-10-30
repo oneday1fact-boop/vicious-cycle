@@ -1,6 +1,8 @@
 # Google Play internal testing
 
-Application ID: `io.github.oneday1factboop.viciouscycle` · Version: `1.0.0` / code `1` · Target SDK: `36` · Minimum Android: `8.0`.
+Application ID: `io.github.oneday1factboop.viciouscycle` · Version: `1.0.1` / code `2` · Target SDK: `36` · Minimum Android: `8.0`.
+
+Version 1.0.0 is already active in internal testing. Upload 1.0.1 to the same app and track as a new release; do not create another app. Keep the existing tester list selected.
 
 ## Console preparation
 
