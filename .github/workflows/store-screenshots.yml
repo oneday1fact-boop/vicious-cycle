@@ -1,0 +1,50 @@
+name: Store screenshots
+on:
+  push:
+    branches: [store-screenshots-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew --no-daemon assembleDebug
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            adb shell wm size 1080x1920
+            adb shell wm density 420
+            adb install app/build/outputs/apk/debug/*x86_64*.apk
+            adb shell svc wifi disable
+            adb shell svc data disable
+            adb shell am start -n io.github.oneday1factboop.viciouscycle.debug/io.github.oneday1factboop.viciouscycle.MainActivity
+            sleep 8
+            mkdir -p store-captures
+            adb exec-out screencap -p > store-captures/01-cover.png
+            adb shell uiautomator dump /sdcard/window.xml
+            adb pull /sdcard/window.xml store-captures/cover-ui.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vicious-cycle-store-captures
+          path: store-captures/
