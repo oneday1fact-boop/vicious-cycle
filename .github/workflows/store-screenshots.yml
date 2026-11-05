@@ -25,6 +25,34 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+      - name: Prepare UI capture script
+        run: |
+          cat > /tmp/capture-store.py <<'PY'
+          import subprocess,time,xml.etree.ElementTree as ET,re
+          from pathlib import Path
+          out=Path("store-captures");out.mkdir(exist_ok=True)
+          def adb(*a): return subprocess.check_output(["adb",*a])
+          def shot(name):
+           time.sleep(3); (out/name).write_bytes(adb("exec-out","screencap","-p"))
+          def tap_text(text):
+           adb("shell","uiautomator","dump","/sdcard/window.xml")
+           xml=adb("shell","cat","/sdcard/window.xml").decode()
+           (out/"latest-ui.xml").write_text(xml)
+           nodes=[n for n in ET.fromstring(xml).iter("node") if n.get("text")==text]
+           if not nodes: raise RuntimeError("Missing UI text: "+text)
+           x1,y1,x2,y2=map(int,re.findall(r"\d+",nodes[0].get("bounds")))
+           adb("shell","input","tap",str((x1+x2)//2),str((y1+y2)//2));time.sleep(3)
+          shot("01-cover.png")
+          tap_text("Start")
+          tap_text("Continue →")
+          tap_text("Enter the story")
+          time.sleep(6)
+          shot("02-story.png")
+          tap_text("Continue ▷")
+          time.sleep(6)
+          shot("03-choices.png")
+          
+          PY
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -39,10 +67,7 @@ jobs:
             adb shell svc data disable
             adb shell am start -n io.github.oneday1factboop.viciouscycle.debug/io.github.oneday1factboop.viciouscycle.MainActivity
             sleep 8
-            mkdir -p store-captures
-            adb exec-out screencap -p > store-captures/01-cover.png
-            adb shell uiautomator dump /sdcard/window.xml
-            adb pull /sdcard/window.xml store-captures/cover-ui.xml
+            python3 /tmp/capture-store.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
